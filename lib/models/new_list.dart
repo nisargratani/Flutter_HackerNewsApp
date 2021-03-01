@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hackernewsapp/models/news.dart';
-import 'package:flutter_hackernewsapp/services/network.dart';
+import 'package:flutter_hackernewsapp/repositories/repository.dart';
 import 'package:flutter_hackernewsapp/services/news_service.dart';
 
 class NewsList extends ChangeNotifier {
@@ -15,7 +15,7 @@ class NewsList extends ChangeNotifier {
   }
 
   Future<void> getTopIds() async {
-    final dynamic allIds = await NetworkHelper().getIds();
+    final dynamic allIds = await Repository().getIds();
     if (allIds != null) {
       for (dynamic x in allIds) {
         topIds.add(x as int);
@@ -25,7 +25,7 @@ class NewsList extends ChangeNotifier {
   }
 
   Future<News> getNewsById(int id) async {
-    dynamic news = await NetworkHelper().getData(id);
+    final dynamic news = await Repository().getData(id);
     if (news != null) {
       return News.fromJson(news as Map<String, dynamic>);
     } else {
@@ -49,7 +49,7 @@ class NewsList extends ChangeNotifier {
           News news = await getNewsById(topIds[index]);
           if (news != null) {
             newList.add(news);
-            await NewsService().saveNews(news);
+            await NewsService().saveNews(news.toJson());
             index++;
           }
         }

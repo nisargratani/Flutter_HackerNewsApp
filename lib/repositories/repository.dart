@@ -1,4 +1,5 @@
 import 'package:flutter_hackernewsapp/repositories/database_connection.dart';
+import 'package:flutter_hackernewsapp/services/network.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Repository {
@@ -15,18 +16,27 @@ class Repository {
     return _database;
   }
 
-  insertData(table, data) async {
+  Future<int> insertData(String table, Map<String, dynamic> data) async {
     var connection = await database;
     return await connection.insert(table, data);
   }
 
-  readData(table) async {
+  Future<List<Map<String, dynamic>>> readData(String table) async {
     var connection = await database;
     return await connection.query(table);
   }
 
-  readDataById(table, newsId) async {
+  Future<List<Map<String, dynamic>>> readDataById(
+      String table, int newsId) async {
     var connection = await database;
     return await connection.query(table, where: 'id=?', whereArgs: [newsId]);
+  }
+
+  Future<dynamic> getIds() async {
+    return await NetworkHelper().getIds();
+  }
+
+  Future<dynamic> getData(int id) async {
+    return await NetworkHelper().getData(id);
   }
 }

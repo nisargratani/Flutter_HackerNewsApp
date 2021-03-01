@@ -1,4 +1,3 @@
-import 'package:flutter_hackernewsapp/models/news.dart';
 import 'package:flutter_hackernewsapp/repositories/repository.dart';
 
 class NewsService {
@@ -6,15 +5,15 @@ class NewsService {
   NewsService() {
     _repository = Repository();
   }
-  saveNews(News news) async {
-    return await _repository.insertData('news', news.toJson());
+  Future<int> saveNews(Map<String, dynamic> news) async {
+    return await _repository.insertData('news', news);
   }
 
-  readNews() async {
+  Future<List<Map<String, dynamic>>> readNews() async {
     return await _repository.readData('news');
   }
 
-  readNewsById(newsId) async {
+  Future<List<Map<String, dynamic>>> readNewsById(int newsId) async {
     return await _repository.readDataById('news', newsId);
   }
 }

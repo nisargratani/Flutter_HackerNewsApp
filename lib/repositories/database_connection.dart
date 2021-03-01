@@ -12,7 +12,7 @@ class DatabaseConnection {
   }
 }
 
-Future _onCreatingDatabase(Database database, int version) async {
+Future<void> _onCreatingDatabase(Database database, int version) async {
   await database.execute(
       "CREATE TABLE news(id INTEGER PRIMARY KEY,title TEXT,date INTEGER,url TEXT)");
 }
