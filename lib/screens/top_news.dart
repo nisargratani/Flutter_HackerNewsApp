@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hackernewsapp/models/news.dart';
+import 'package:flutter_hackernewsapp/models/new_list.dart';
+import 'package:flutter_hackernewsapp/screens/loading_screen.dart';
+import 'package:provider/provider.dart';
 
 class TopNews extends StatefulWidget {
-  TopNews({this.newsData});
-  final newsData;
   @override
   _TopNewsState createState() => _TopNewsState();
 }
 
 class _TopNewsState extends State<TopNews> {
-  List<News> news;
+  ScrollController _scrollController = ScrollController();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    updateNews(widget.newsData);
-  }
-
-  void updateNews(dynamic newsData) {
-    news = newsData;
+    Provider.of<NewsList>(context, listen: false).getNextNews();
+    _scrollController.addListener(() async {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        await Provider.of<NewsList>(context, listen: false).getNextNews();
+      }
+    });
   }
 
   @override
@@ -27,25 +28,46 @@ class _TopNewsState extends State<TopNews> {
       appBar: AppBar(
         title: Text('News'),
       ),
-      body: ListView.builder(
-        itemCount: news.length,
-        itemBuilder: (context, index) {
-          return InkWell(
-            onTap: () {
-              print("Clicked $index");
-            },
-            child: Card(
-              color: Colors.blueGrey,
-              elevation: 8.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
+      body: Consumer<NewsList>(
+        builder: (BuildContext context, NewsList value, Widget child) => (value
+                .newsList.isEmpty)
+            ? LoadingScreen()
+            : ListView.builder(
+                controller: _scrollController,
+                itemCount: value.newsList.length + 1,
+                itemBuilder: (BuildContext context, int index) {
+                  if (index != value.newsList.length) {
+                    return Padding(
+                      padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+                      child: Card(
+                        elevation: 5.0,
+                        child: ListTile(
+                          onTap: () {
+                            //TODO : Add News Screen
+                          },
+                          title: Text(value.newsList[index].title),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text('id'),
+                              Text('${value.newsList[index].id}'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Center(
+                      child: Container(
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        height: 60.0,
+                        width: 45.0,
+                        child: Text('Process'),
+                      ),
+                    );
+                  }
+                },
               ),
-              child: ListTile(
-                title: Text(news[index].title),
-              ),
-            ),
-          );
-        },
       ),
     );
   }
